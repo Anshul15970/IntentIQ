@@ -1,5 +1,6 @@
 from models.prompt_models.gemma_model import GemmaModel
-
+import time 
+start = time.time()
 model = GemmaModel()
 
 print("Loading model...")
@@ -11,3 +12,4 @@ result = model.predict(
 )
 
 print(result)
+print("Time: ",time.time() - start)

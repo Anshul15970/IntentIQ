@@ -4,7 +4,7 @@ import torch
 from models.base_model import BaseModel
 from prompts.few_shot_prompt import build_few_shot_prompt
 
-
+FEW_SHOT_PROMPT = build_few_shot_prompt(num_examples=5)
 class HuggingFaceModel(BaseModel):
 
     def __init__(self, model_name):
@@ -34,7 +34,7 @@ class HuggingFaceModel(BaseModel):
         messages = [
             {
                 "role": "system",
-                "content": build_few_shot_prompt(num_examples=5)
+                "content": FEW_SHOT_PROMPT
             },
             {
                 "role": "user",

@@ -1,16 +1,17 @@
 from datasets import load_dataset
 
+print("Building few-shot prompt...")
+
+dataset = load_dataset(
+    "PolyAI/banking77",
+    trust_remote_code=True
+)
+
+train = dataset["train"]
+label_names = train.features["label"].names
+
 
 def build_few_shot_prompt(num_examples=5):
-
-    dataset = load_dataset(
-        "PolyAI/banking77",
-        trust_remote_code=True
-    )
-
-    train = dataset["train"]
-
-    label_names = train.features["label"].names
 
     prompt = """
 You are an intent classification expert.

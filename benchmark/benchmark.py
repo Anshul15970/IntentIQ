@@ -4,7 +4,7 @@ from sklearn.metrics import (
 )
 from utils.label_validator import LabelValidator
 from utils.intent_mapper import IntentMapper
-
+import time 
 class Benchmark:
 
     def __init__(self, model):
@@ -17,6 +17,7 @@ class Benchmark:
         predictions = []
         valid_predictions = 0
         invalid_predictions = 0
+        start_time = time.time()
         
         for text in texts:
             result = self.model.predict(text)
@@ -28,7 +29,7 @@ class Benchmark:
                 valid_predictions += 1
             else:
                 invalid_predictions += 1
-
+        
         accuracy = accuracy_score(labels, predictions)
 
         precision, recall, f1, _ = precision_recall_fscore_support(
@@ -37,7 +38,9 @@ class Benchmark:
             average="weighted",
             zero_division=0
         )
+        total_time = time.time() - start_time
 
+        average_time = total_time / len(texts)
         return {
             "accuracy": accuracy,
             "precision": precision,
@@ -45,5 +48,7 @@ class Benchmark:
             "f1": f1,
             "valid_predictions": valid_predictions,
             "invalid_predictions": invalid_predictions,
-            "predictions": predictions
+            "predictions": predictions,
+            "total_time": total_time,
+            "average_time": average_time
         }

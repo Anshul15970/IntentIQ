@@ -20,12 +20,14 @@ class BenchmarkPlotter:
 
         plt.figure(figsize=(8, 5))
 
+        labels = self.df["Model"] + "\n(" + self.df["Prompt Type"] + ")"
+
         plt.bar(
-            self.df["Model"],
+            labels,
             self.df["Accuracy"]
         )
 
-        plt.title("Model Accuracy Comparison")
+        plt.title("Accuracy Comparison Across Models and Prompt Types")
 
         plt.xlabel("Model")
 

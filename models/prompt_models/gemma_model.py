@@ -1,10 +1,10 @@
-from models.hf_model import HuggingFaceModel
+from models.hf_model import HFModel
 
 
-class GemmaModel(HuggingFaceModel):
+class GemmaModel(HFModel):
 
-    def __init__(self):
-
+    def __init__(self, prompt_type="few_shot"):
         super().__init__(
-            "google/gemma-3-1b-it"
+            "google/gemma-3-1b-it",
+            prompt_type
         )

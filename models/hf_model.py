@@ -3,13 +3,14 @@ import torch
 
 from models.base_model import BaseModel
 from prompts.few_shot_prompt import build_few_shot_prompt
+from prompts.zero_shot_prompt import build_zero_shot_prompt
 
 FEW_SHOT_PROMPT = build_few_shot_prompt(num_examples=5)
-class HuggingFaceModel(BaseModel):
+class HFModel(BaseModel):
 
-    def __init__(self, model_name):
-
+    def __init__(self, model_name, prompt_type="few_shot"):
         self.model_name = model_name
+        self.prompt_type = prompt_type
 
         self.tokenizer = None
 
@@ -34,7 +35,11 @@ class HuggingFaceModel(BaseModel):
         messages = [
             {
                 "role": "system",
-                "content": FEW_SHOT_PROMPT
+                "content": (
+                    build_few_shot_prompt(num_examples=5)
+                    if self.prompt_type == "few_shot"
+                    else build_zero_shot_prompt()
+                )
             },
             {
                 "role": "user",

@@ -7,10 +7,11 @@ class ResultLogger:
     def __init__(self, filepath="results/benchmark_results.csv"):
         self.filepath = filepath
 
-    def log(self, model_name, num_samples, results):
+    def log(self, model_name, prompt_type, num_samples, results):
 
         row = {
     "Model": model_name,
+    "Prompt Type": prompt_type,
     "Samples": num_samples,
 
     "Accuracy": results["accuracy"],

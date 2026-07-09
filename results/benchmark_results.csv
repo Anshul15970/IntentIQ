@@ -1,7 +1,9 @@
-Model,Samples,Accuracy,Precision,Recall,F1,Total Time (s),Avg Time / Query (s),Valid Predictions,Invalid Predictions
-Qwen/Qwen2.5-0.5B-Instruct,50,0.44,0.925,0.44,0.5883040935672514,95.67,1.913,50,0
-google/gemma-3-1b-it,50,0.6,0.9142857142857144,0.6,0.7244206773618538,264.18,5.284,50,0
-Qwen/Qwen2.5-0.5B-Instruct,50,0.48,0.921904761904762,0.48,0.6312568306010928,94.69,1.894,50,0
-google/gemma-3-1b-it,50,0.6,0.9142857142857144,0.6,0.7244206773618538,207.48,4.15,50,0
-Qwen/Qwen2.5-0.5B-Instruct,50,0.46,0.8742857142857143,0.46,0.6007843137254902,94.37,1.887,50,0
-google/gemma-3-1b-it,50,0.6,0.925,0.6,0.7264957264957265,240.14,4.803,50,0
+Model,Prompt Type,Samples,Accuracy,Precision,Recall,F1,Total Time (s),Avg Time / Query (s),Valid Predictions,Invalid Predictions
+Qwen/Qwen2.5-0.5B-Instruct,zero_shot,50,0.02,0.2,0.02,0.0363636363636363,159.82,3.196,50,0
+Qwen/Qwen2.5-0.5B-Instruct,few_shot,50,0.58,0.975,0.58,0.7232974910394266,179.94,3.599,50,0
+google/gemma-3-1b-it,zero_shot,50,0.24,0.875,0.24,0.3605442176870748,198.25,3.965,50,0
+google/gemma-3-1b-it,few_shot,50,0.58,0.893,0.58,0.701880341880342,856.98,17.14,50,0
+Qwen/Qwen2.5-0.5B-Instruct,zero_shot,50,0.04,1.0,0.04,0.0753880266075388,43.25,0.865,50,0
+Qwen/Qwen2.5-0.5B-Instruct,few_shot,50,0.52,0.942857142857143,0.52,0.6684667309546769,168.31,3.366,50,0
+google/gemma-3-1b-it,zero_shot,50,0.2,0.9,0.2,0.3132978723404255,145.0,2.9,50,0
+google/gemma-3-1b-it,few_shot,50,0.64,0.9333333333333332,0.64,0.7566188197767145,425.52,8.51,50,0

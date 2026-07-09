@@ -22,7 +22,12 @@ texts = test_data["text"]
 labels = [label_names[i] for i in test_data["label"]]
 
 # Load model
-models = [QwenModel(),GemmaModel()]
+models = [
+    QwenModel(prompt_type="zero_shot"),
+    QwenModel(prompt_type="few_shot"),
+    GemmaModel(prompt_type="zero_shot"),
+    GemmaModel(prompt_type="few_shot")
+]
 logger = ResultLogger()
 # Run benchmark
 for model in models:
@@ -33,6 +38,7 @@ for model in models:
     print(results)
     logger.log(
     model.get_model_name(),
+    model.prompt_type,
     NUM_SAMPLES,
     results
 )

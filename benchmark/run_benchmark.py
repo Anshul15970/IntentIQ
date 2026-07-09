@@ -44,3 +44,6 @@ for model in models:
 )
 plotter = BenchmarkPlotter()
 plotter.plot_accuracy()
+plotter.plot_f1()
+plotter.plot_time()
+plotter.plot_tradeoff()

@@ -1,0 +1,23 @@
+MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+
+MAX_LENGTH = 256
+
+OUTPUT_DIR = "finetuning/checkpoints"
+
+NUM_EPOCHS = 3
+
+BATCH_SIZE = 4
+
+LEARNING_RATE = 2e-4
+
+LORA_R = 16
+
+LORA_ALPHA = 32
+
+LORA_DROPOUT = 0.1
+
+LOGGING_STEPS = 10
+
+SAVE_STEPS = 100
+
+EVAL_STEPS = 100

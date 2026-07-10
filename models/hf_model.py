@@ -20,13 +20,11 @@ class HFModel(BaseModel):
     def load_model(self):
 
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name,
-            token=True
+            self.model_name
         )
 
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
-            token=True,
             torch_dtype="auto",
             device_map="auto"
         )

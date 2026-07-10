@@ -9,6 +9,6 @@ BENCHMARK_MODELS = [
 
     GemmaModel("zero_shot"),
     GemmaModel("few_shot"),
-    GemmaModel("dynamic_few_shot"),
+    GemmaModel("dynamic_few_shot")
 
 ]

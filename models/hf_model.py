@@ -4,8 +4,9 @@ import torch
 from models.base_model import BaseModel
 from prompts.few_shot_prompt import build_few_shot_prompt
 from prompts.zero_shot_prompt import build_zero_shot_prompt
+from prompts.dynamic_few_shot import DynamicFewShot
 
-FEW_SHOT_PROMPT = build_few_shot_prompt(num_examples=5)
+DYNAMIC_RETRIEVER = DynamicFewShot()
 class HFModel(BaseModel):
 
     def __init__(self, model_name, prompt_type="few_shot"):
@@ -32,14 +33,32 @@ class HFModel(BaseModel):
 
     def predict(self, text: str):
 
+        if self.prompt_type == "zero_shot":
+
+            system_prompt = build_zero_shot_prompt()
+
+        elif self.prompt_type == "few_shot":
+
+            system_prompt = build_few_shot_prompt(
+                num_examples=5
+            )
+
+        elif self.prompt_type == "dynamic_few_shot":
+
+            system_prompt = DYNAMIC_RETRIEVER.build_prompt(
+                text
+            )
+
+        else:
+
+            raise ValueError(
+                f"Unknown prompt type: {self.prompt_type}"
+            )
+
         messages = [
             {
                 "role": "system",
-                "content": (
-                    build_few_shot_prompt(num_examples=5)
-                    if self.prompt_type == "few_shot"
-                    else build_zero_shot_prompt()
-                )
+                "content": system_prompt
             },
             {
                 "role": "user",

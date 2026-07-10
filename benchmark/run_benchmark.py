@@ -15,7 +15,7 @@ dataset = load_dataset(
 label_names = dataset["test"].features["label"].names
 
 # Use first 100 test samples
-NUM_SAMPLES = 50
+NUM_SAMPLES = 20
 test_data = dataset["test"].select(range(NUM_SAMPLES))
 
 texts = test_data["text"]
@@ -23,15 +23,22 @@ labels = [label_names[i] for i in test_data["label"]]
 
 # Load model
 models = [
-    QwenModel(prompt_type="zero_shot"),
-    QwenModel(prompt_type="few_shot"),
-    GemmaModel(prompt_type="zero_shot"),
-    GemmaModel(prompt_type="few_shot")
+
+    QwenModel("zero_shot"),
+    QwenModel("few_shot"),
+    QwenModel("dynamic_few_shot"),
+
+    GemmaModel("zero_shot"),
+    GemmaModel("few_shot"),
+    GemmaModel("dynamic_few_shot"),
 ]
 logger = ResultLogger()
 # Run benchmark
 for model in models:
-    print(f"\nRunning benchmark for {model.get_model_name()}")
+    print(
+    f"\nRunning benchmark for "
+    f"{model.get_model_name()} "
+    f"({model.prompt_type})")
     model.load_model()
     benchmark = Benchmark(model)
     results = benchmark.evaluate(texts, labels)

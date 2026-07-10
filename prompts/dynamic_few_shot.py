@@ -42,16 +42,22 @@ class DynamicFewShot:
 
         top_indices = torch.topk(
             similarities,
-            k=k
+            k=20
         ).indices
 
         examples = []
-
+        used_intents = set()
+        
         for idx in top_indices:
 
             sample = self.train[idx.item()]
 
             intent = self.label_names[sample["label"]]
+
+            if intent in used_intents:
+                continue
+
+            used_intents.add(intent)
 
             examples.append(
                 {
@@ -59,6 +65,9 @@ class DynamicFewShot:
                     "intent": intent
                 }
             )
+
+            if len(examples) == k:
+                break
 
         return examples
     

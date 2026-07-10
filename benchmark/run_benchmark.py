@@ -5,6 +5,7 @@ from models.prompt_models.gemma_model import GemmaModel
 from benchmark.benchmark import Benchmark
 from utils.result_logger import ResultLogger
 from visualization.plot_results import BenchmarkPlotter
+from config.benchmark_config import BENCHMARK_MODELS
 # Load dataset
 dataset = load_dataset(
     "PolyAI/banking77",
@@ -15,26 +16,16 @@ dataset = load_dataset(
 label_names = dataset["test"].features["label"].names
 
 # Use first 100 test samples
-NUM_SAMPLES = 20
+NUM_SAMPLES = 5
 test_data = dataset["test"].select(range(NUM_SAMPLES))
 
 texts = test_data["text"]
 labels = [label_names[i] for i in test_data["label"]]
 
 # Load model
-models = [
-
-    QwenModel("zero_shot"),
-    QwenModel("few_shot"),
-    QwenModel("dynamic_few_shot"),
-
-    GemmaModel("zero_shot"),
-    GemmaModel("few_shot"),
-    GemmaModel("dynamic_few_shot"),
-]
 logger = ResultLogger()
 # Run benchmark
-for model in models:
+for model in BENCHMARK_MODELS:
     print(
     f"\nRunning benchmark for "
     f"{model.get_model_name()} "

@@ -1,6 +1,9 @@
 import os
 import pandas as pd
-
+from datetime import datetime
+import platform
+import torch
+import transformers
 
 class ResultLogger:
 
@@ -10,6 +13,12 @@ class ResultLogger:
     def log(self, model_name, prompt_type, num_samples, results):
 
         row = {
+    "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "Device": "CUDA" if torch.cuda.is_available() else "CPU",
+    "OS": platform.system(),
+    "Python": platform.python_version(),
+    "PyTorch": torch.__version__,
+    "Transformers": transformers.__version__,
     "Model": model_name,
     "Prompt Type": prompt_type,
     "Samples": num_samples,

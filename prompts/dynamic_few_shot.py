@@ -9,16 +9,12 @@ class DynamicFewShot:
         self.embedding_model = SentenceTransformer(
             "sentence-transformers/all-MiniLM-L6-v2")
         self.dataset = load_dataset(
-            "PolyAI/banking77",
-             trust_remote_code=True)
+            "PolyAI/banking77")
 
         self.train = self.dataset["train"]
 
         self.label_names = self.train.features["label"].names
         
-        self.train = self.dataset["train"]
-
-        self.label_names = self.train.features["label"].names
 
         print("Encoding Banking77 training set...")
 

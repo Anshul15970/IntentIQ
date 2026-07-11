@@ -24,7 +24,20 @@ class BaseModel(ABC):
             dict: Prediction result.
         """
         pass
+    
+    @abstractmethod
+    def predict_batch(self, texts: list[str]):
+        """
+        Predict intents for multiple sentences at once.
 
+        Parameters:
+            texts (list[str]): List of input sentences.
+
+        Returns:
+            list[dict]: List of prediction dictionaries.
+        """
+        pass
+    
     @abstractmethod
     def get_model_name(self):
         """Return the model name."""

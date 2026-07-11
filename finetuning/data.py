@@ -35,18 +35,26 @@ Return ONLY the intent label.
     }
 
 
-def prepare_dataset():
+def prepare_dataset(format_for_training=True):
 
     dataset = load_banking77()
 
     label_names = get_label_names(dataset)
 
-    train_dataset = dataset["train"].map(
-        lambda x: format_example(x, label_names)
-    )
+    if format_for_training:
 
-    test_dataset = dataset["test"].map(
-        lambda x: format_example(x, label_names)
-    )
+        train_dataset = dataset["train"].map(
+            lambda x: format_example(x, label_names)
+        )
+
+        test_dataset = dataset["test"].map(
+            lambda x: format_example(x, label_names)
+        )
+
+    else:
+
+        train_dataset = dataset["train"]
+
+        test_dataset = dataset["test"]
 
     return train_dataset, test_dataset, label_names

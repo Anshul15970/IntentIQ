@@ -17,6 +17,7 @@ import os
 
 DYNAMIC_RETRIEVER = None
 
+port = int(os.environ.get("PORT", 7860))
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -268,4 +269,7 @@ with gr.Blocks(title="IntentIQ") as demo:
 
 
 
-demo.launch()
+demo.launch(
+    server_name="0.0.0.0",
+    server_port=port
+)

@@ -4,7 +4,7 @@ print("Building few-shot prompt...")
 
 dataset = load_dataset(
     "PolyAI/banking77",
-    trust_remote_code=True
+    "default"
 )
 
 train = dataset["train"]

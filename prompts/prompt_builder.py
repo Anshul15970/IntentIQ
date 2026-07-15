@@ -4,9 +4,9 @@ from datasets import load_dataset
 def get_intent_labels():
 
     dataset = load_dataset(
-        "PolyAI/banking77",
-        trust_remote_code=True
-    )
+    "PolyAI/banking77",
+    "default"
+)
 
     return dataset["train"].features["label"].names
 

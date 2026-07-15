@@ -106,7 +106,7 @@ def load_confusion_matrix(model):
 def call_hf_api(system_prompt, user_prompt):
 
     payload = {
-        "model": "llama-3.1-8b-instant",
+        "model": "qwen/qwen3-32b",
         "messages": [
             {
                 "role": "system",
@@ -118,7 +118,8 @@ def call_hf_api(system_prompt, user_prompt):
             }
         ],
         "max_tokens": 20,
-        "temperature": 0
+        "temperature": 0,
+        "reasoning_effort": "none"
     }
 
     response = requests.post(

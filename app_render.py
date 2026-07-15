@@ -1,79 +1,31 @@
+
+import os
+import requests
+
 import gradio as gr
 
-from transformers import AutoTokenizer
-from transformers import AutoModelForCausalLM
 from utils.load_benchmark import load_benchmark
-from peft import PeftModel
 from utils.load_error_summary import load_error_summary
-from finetuning.config import MODEL_NAME
-from finetuning.config import OUTPUT_DIR
-from models.prompt_models.qwen_model import QwenModel
 from utils.error_summary import summarize_errors
 from utils.project_summary import generate_project_summary
-
-print("Loading LoRA model...")
-
-tokenizer = AutoTokenizer.from_pretrained(
-    MODEL_NAME
-)
-
-base_model = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME,
-    device_map="auto",
-    torch_dtype="auto"
-)
-
-model = PeftModel.from_pretrained(
-    base_model,
-    OUTPUT_DIR
-)
-
-print("LoRA loaded successfully!")
-
-# Prompt models (lazy loaded)
-
-zero_model = None
-few_model = None
-dynamic_model = None
-
-def get_prompt_model(model_type):
-
-    global zero_model
-    global few_model
-    global dynamic_model
-
-    if model_type == "Zero-shot":
-
-        if zero_model is None:
-            print("Loading Zero-shot model...")
-            zero_model = QwenModel(prompt_type="zero_shot")
-            zero_model.load_model()
-
-        return zero_model
-
-    elif model_type == "Few-shot":
-
-        if few_model is None:
-            print("Loading Few-shot model...")
-            few_model = QwenModel(prompt_type="few_shot")
-            few_model.load_model()
-
-        return few_model
-
-    elif model_type == "Dynamic Few-shot":
-
-        if dynamic_model is None:
-            print("Loading Dynamic Few-shot model...")
-            dynamic_model = QwenModel(
-                prompt_type="dynamic_few_shot"
-            )
-            dynamic_model.load_model()
-
-        return dynamic_model
-
-    return None
+from prompts.zero_shot_prompt import build_zero_shot_prompt
+from prompts.few_shot_prompt import build_few_shot_prompt
+from prompts.dynamic_few_shot import DynamicFewShot
 
 import time
+import os
+
+DYNAMIC_RETRIEVER = None
+
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+API_URL = "https://api.groq.com/openai/v1/chat/completions"
+
+HEADERS = {
+    "Authorization": f"Bearer {GROQ_API_KEY}",
+    "Content-Type": "application/json"
+}
 
 def compare_models(query):
     
@@ -85,8 +37,7 @@ def compare_models(query):
     for model_name in [
         "Zero-shot",
         "Few-shot",
-        "Dynamic Few-shot",
-        "LoRA"
+        "Dynamic Few-shot"
     ]:
 
         prediction, inference_time = predict_intent(
@@ -103,59 +54,39 @@ def compare_models(query):
     return results
 
 def predict_intent(query, selected_model):
-    
+
     if not query or not query.strip():
         return "❌ Please enter a banking query.", ""
 
     start = time.time()
 
-    if selected_model == "LoRA":
+    if selected_model == "Zero-shot":
 
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "You are an intent classification assistant.\n\n"
-                    "Return ONLY the intent label."
-                )
-            },
-            {
-                "role": "user",
-                "content": query
-            }
-        ]
+        system_prompt = build_zero_shot_prompt()
 
-        prompt = tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
+    elif selected_model == "Few-shot":
+
+        system_prompt = build_few_shot_prompt(
+            num_examples=5
         )
 
-        inputs = tokenizer(
-            prompt,
-            return_tensors="pt"
-        ).to(model.device)
+    elif selected_model == "Dynamic Few-shot":
 
-        outputs = model.generate(
-        **inputs,
-        max_new_tokens=20,
-        do_sample=False,
-        temperature=None,
-        top_p=None
-        )
+        global DYNAMIC_RETRIEVER
 
-        prediction = tokenizer.decode(
-            outputs[0][inputs["input_ids"].shape[1]:],
-            skip_special_tokens=True
-        ).strip()
+        if DYNAMIC_RETRIEVER is None:
+            DYNAMIC_RETRIEVER = DynamicFewShot()
+
+        system_prompt = DYNAMIC_RETRIEVER.build_prompt(query)
 
     else:
 
-        prompt_model = get_prompt_model(selected_model)
+        return "Unknown model", ""
 
-        result = prompt_model.predict(query)
-
-        prediction = result["prediction"]
+    prediction = call_hf_api(
+        system_prompt,
+        query
+    )
 
     elapsed = time.time() - start
 
@@ -172,6 +103,38 @@ def load_confusion_matrix(model):
 
     return mapping[model]
 
+def call_hf_api(system_prompt, user_prompt):
+
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": [
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": user_prompt
+            }
+        ],
+        "max_tokens": 20,
+        "temperature": 0
+    }
+
+    response = requests.post(
+        API_URL,
+        headers=HEADERS,
+        json=payload,
+        timeout=60
+    )
+
+    if not response.ok:
+        print(response.status_code)
+        print(response.text)
+        response.raise_for_status()
+
+    return response.json()["choices"][0]["message"]["content"].strip()
+
 with gr.Blocks(title="IntentIQ") as demo:
 
     with gr.Tab("Prediction"):
@@ -187,12 +150,11 @@ with gr.Blocks(title="IntentIQ") as demo:
 
         dropdown = gr.Dropdown(
             choices=[
-                "LoRA",
                 "Zero-shot",
                 "Few-shot",
                 "Dynamic Few-shot"
             ],
-            value="LoRA",
+            value="Zero-shot",
             label="Model"
         )
 

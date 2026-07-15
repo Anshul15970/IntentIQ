@@ -1,14 +1,8 @@
-from datasets import load_dataset
+import pandas as pd
 
 print("Building few-shot prompt...")
 
-dataset = load_dataset(
-    "PolyAI/banking77",
-    "default"
-)
-
-train = dataset["train"]
-label_names = train.features["label"].names
+train = pd.read_csv("data/banking77_train.csv")
 
 
 def build_few_shot_prompt(num_examples=5):
@@ -26,9 +20,9 @@ Examples:
 
     used = set()
 
-    for sample in train:
+    for _, sample in train.iterrows():
 
-        intent = label_names[sample["label"]]
+        intent = sample["intent"]
 
         if intent in used:
             continue

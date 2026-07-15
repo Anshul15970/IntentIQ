@@ -1,29 +1,27 @@
-from datasets import load_dataset
+import pandas as pd
 from sentence_transformers import SentenceTransformer
 from sentence_transformers import util
 import torch
 
+
 class DynamicFewShot:
 
     def __init__(self):
+
         self.embedding_model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2")
-        self.dataset = load_dataset(
-            "PolyAI/banking77")
+            "sentence-transformers/all-MiniLM-L6-v2"
+        )
 
-        self.train = self.dataset["train"]
-
-        self.label_names = self.train.features["label"].names
-        
+        self.train = pd.read_csv("data/banking77_train.csv")
 
         print("Encoding Banking77 training set...")
 
         self.train_embeddings = self.embedding_model.encode(
-            self.train["text"],
+            self.train["text"].tolist(),
             convert_to_tensor=True,
             show_progress_bar=True
         )
-    
+
     def retrieve_examples(self, query, k=5):
 
         query_embedding = self.embedding_model.encode(
@@ -43,12 +41,12 @@ class DynamicFewShot:
 
         examples = []
         used_intents = set()
-        
+
         for idx in top_indices:
 
-            sample = self.train[idx.item()]
+            sample = self.train.iloc[idx.item()]
 
-            intent = self.label_names[sample["label"]]
+            intent = sample["intent"]
 
             if intent in used_intents:
                 continue
@@ -66,41 +64,41 @@ class DynamicFewShot:
                 break
 
         return examples
-    
+
     def build_prompt(self, query, k=5):
 
         examples = self.retrieve_examples(query, k)
 
         prompt = """
-    You are an intent classification expert.
+You are an intent classification expert.
 
-    Choose exactly ONE intent.
+Choose exactly ONE intent.
 
-    Return ONLY the intent label.
+Return ONLY the intent label.
 
-    Examples:
+Examples:
 
-    """
+"""
 
         for example in examples:
 
             prompt += f"""
-    Sentence:
-    {example['text']}
+Sentence:
+{example['text']}
 
-    Intent:
-    {example['intent']}
+Intent:
+{example['intent']}
 
-    """
+"""
 
         prompt += f"""
 
-    Now classify this sentence.
+Now classify this sentence.
 
-    Sentence:
-    {query}
+Sentence:
+{query}
 
-    Intent:
-    """
+Intent:
+"""
 
         return prompt

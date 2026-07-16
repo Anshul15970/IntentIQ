@@ -10,12 +10,10 @@ from utils.error_summary import summarize_errors
 from utils.project_summary import generate_project_summary
 from prompts.zero_shot_prompt import build_zero_shot_prompt
 from prompts.few_shot_prompt import build_few_shot_prompt
-from prompts.dynamic_few_shot import DynamicFewShot
 
 import time
 import os
 
-DYNAMIC_RETRIEVER = None
 
 port = int(os.environ.get("PORT", 7860))
 
@@ -37,8 +35,7 @@ def compare_models(query):
 
     for model_name in [
         "Zero-shot",
-        "Few-shot",
-        "Dynamic Few-shot"
+        "Few-shot"
     ]:
 
         prediction, inference_time = predict_intent(
@@ -70,15 +67,6 @@ def predict_intent(query, selected_model):
         system_prompt = build_few_shot_prompt(
             num_examples=5
         )
-
-    elif selected_model == "Dynamic Few-shot":
-
-        global DYNAMIC_RETRIEVER
-
-        if DYNAMIC_RETRIEVER is None:
-            DYNAMIC_RETRIEVER = DynamicFewShot()
-
-        system_prompt = DYNAMIC_RETRIEVER.build_prompt(query)
 
     else:
 
@@ -153,8 +141,7 @@ with gr.Blocks(title="IntentIQ") as demo:
         dropdown = gr.Dropdown(
             choices=[
                 "Zero-shot",
-                "Few-shot",
-                "Dynamic Few-shot"
+                "Few-shot"
             ],
             value="Zero-shot",
             label="Model"
